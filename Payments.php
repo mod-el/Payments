@@ -6,15 +6,17 @@ class Payments extends Module
 {
 	/**
 	 * @param PaymentsOrderInterface $order
+	 * @param string $type
 	 * @param array $options
+	 * @return mixed
 	 */
-	public function beginPayment(PaymentsOrderInterface $order, array $options = [])
+	public function beginPayment(PaymentsOrderInterface $order, string $type, array $options = [])
 	{
 		$gateway = $order->getGateway();
 		if ($gateway === null)
-			return;
+			return null;
 
-		$this->model->getModule($gateway)->beginPayment($order, $options);
+		return $this->model->getModule($gateway)->beginPayment($order, $type, $options);
 	}
 
 	/**

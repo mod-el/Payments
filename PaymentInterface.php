@@ -2,7 +2,7 @@
 
 interface PaymentInterface
 {
-	public function beginPayment(PaymentsOrderInterface $order, array $options = []);
+	public function beginPayment(PaymentsOrderInterface $order, string $type, array $options = []);
 
 	public function handleRequest(): array;
 }
