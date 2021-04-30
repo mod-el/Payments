@@ -12,11 +12,15 @@ class Payments extends Module
 	 */
 	public function beginPayment(PaymentsOrderInterface $order, string $type, array $options = [])
 	{
-		$gateway = $order->getGateway();
-		if ($gateway === null)
+		$gatewayName = $order->getGateway();
+		if ($gatewayName === null)
 			return null;
 
-		return $this->model->getModule($gateway)->beginPayment($order, $type, $options);
+		$gateway = $this->model->getModule($gatewayName);
+		if (!($gateway instanceof PaymentInterface))
+			throw new \Exception('Provided gateway does not exist', 400);
+
+		return $gateway->beginPayment($order, $type, $options);
 	}
 
 	/**
