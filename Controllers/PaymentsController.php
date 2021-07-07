@@ -41,9 +41,13 @@ class PaymentsController extends Controller
 					if (!($gateway instanceof PaymentInterface))
 						throw new \Exception('Bad payment gateway');
 
-					$confirmData = $gateway->handleRequest();
+					try {
+						$confirmData = $gateway->handleRequest();
 
-					$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
+						$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
+					} catch (\Throwable $e) {
+						$response = $gateway->handleFailure($e);
+					}
 
 					switch ($response['type']) {
 						case 'text':

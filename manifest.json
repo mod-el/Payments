@@ -1,7 +1,7 @@
 {
 	"name": "Payments",
 	"description": "Unified payments management",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"dependencies": {
 		"Core": ">=2.10.0",
 		"ORM": ">=1.6.0"
