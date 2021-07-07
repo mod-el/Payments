@@ -24,6 +24,7 @@ $config = [
 			\'url\' => PATH,
 		];
 	},
+	\'response-on-failure\' => null,
 ];
 ';
 		});

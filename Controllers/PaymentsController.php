@@ -13,10 +13,10 @@ class PaymentsController extends Controller
 			if (count($request) < 3)
 				throw new \Exception('Wrong number of parameters');
 
+			$config = $this->model->_Payments->retrieveConfig();
+
 			switch ($request[1]) {
 				case 'pay':
-					$config = $this->model->_Payments->retrieveConfig();
-
 					if (!isset($request[2]) or !is_numeric($request[2]))
 						throw new \Exception('Wrong id parameter');
 
@@ -26,12 +26,11 @@ class PaymentsController extends Controller
 					$order = $this->model->one($config['order-element'], $request[2]);
 					$response = $this->model->_Payments->beginPayment($order, $request[3], $_POST);
 
-					if ($request[3] === 'client') {
+					if ($request[3] === 'client')
 						return $response;
-					} else {
+					else
 						die();
-					}
-					break;
+
 				case 'notify':
 					$supposedGateway = $request[2];
 					if ($supposedGateway and !$this->model->moduleExists($supposedGateway))
@@ -46,7 +45,10 @@ class PaymentsController extends Controller
 
 						$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
 					} catch (\Throwable $e) {
-						$response = $gateway->handleFailure($e);
+						if (isset($config['response-on-failure']))
+							$response = $config['response-on-failure']($e);
+						else
+							throw $e;
 					}
 
 					switch ($response['type']) {
