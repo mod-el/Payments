@@ -1,6 +1,7 @@
 <?php namespace Model\Payments\Controllers;
 
 use Model\Core\Controller;
+use Model\Payments\PaymentException;
 use Model\Payments\PaymentInterface;
 
 class PaymentsController extends Controller
@@ -45,6 +46,11 @@ class PaymentsController extends Controller
 
 						$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
 					} catch (\Throwable $e) {
+						if (get_class($e) !== 'Model\\Payments\\PaymentException')
+							$e = new PaymentException($e->getMessage(), $e->getCode(), $e);
+
+						$e->gateway = $supposedGateway;
+
 						if (isset($config['response-on-failure']))
 							$response = $config['response-on-failure']($e);
 						else
