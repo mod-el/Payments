@@ -35,8 +35,7 @@ class Payments extends Module
 	{
 		$config = $this->retrieveConfig();
 
-		/** @var PaymentsOrderInterface $order */
-		$order = $this->model->_ORM->one($config['order-element'], $orderId);
+		$order = $this->getElementFromId($orderId);
 
 		if ($order->getGateway() !== $gateway)
 			throw new \Exception('Payment gateway mismatch');
@@ -54,6 +53,24 @@ class Payments extends Module
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function checkOrderStatus(int $orderId): bool
+	{
+		$order = $this->getElementFromId($orderId);
+
+		$gatewayName = $order->getGateway();
+		if ($gatewayName === null)
+			return false;
+
+		$gateway = $this->model->getModule($gatewayName);
+		if (!($gateway instanceof PaymentInterface))
+			throw new \Exception('Provided gateway does not exist', 400);
+
+		return $gateway->checkOrderStatus($order);
+	}
+
+	/**
 	 * @param array $request
 	 * @param string $rule
 	 * @return array|null
@@ -63,5 +80,15 @@ class Payments extends Module
 		return $rule === 'payments' ? [
 			'controller' => 'Payments',
 		] : null;
+	}
+
+	/**
+	 * @param int $id
+	 * @return PaymentsOrderInterface
+	 */
+	public function getElementFromId(int $id): PaymentsOrderInterface
+	{
+		$config = $this->retrieveConfig();
+		return $this->model->_ORM->one($config['order-element'], $id);
 	}
 }
