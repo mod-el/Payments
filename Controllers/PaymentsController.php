@@ -57,7 +57,7 @@ class PaymentsController extends Controller
 							throw $e;
 					}
 
-					switch ($response['type']) {
+					switch ($response['type'] ?? null) {
 						case 'text':
 							echo $response['text'];
 							die();

@@ -47,8 +47,9 @@ class Payments extends Module
 		if ($order->isPaid()) {
 			return $config['response-if-already-paid']($gateway, $order, $gatewayMeta);
 		} else {
+			$response = $config['response-when-paid']($gateway, $order, $gatewayMeta);
 			$order->markAsPaid();
-			return $config['response-when-paid']($gateway, $order, $gatewayMeta);
+			return $response;
 		}
 	}
 
