@@ -42,10 +42,18 @@ class PaymentsController extends Controller
 						throw new \Exception('Bad payment gateway');
 
 					try {
+						$this->model->_Db->beginTransaction();
+
+						$this->model->_Db->updateOrInsert('main_settings', ['k' => 'payments-dummy'], ['v' => time() . '-' . uniqid()]);
+
 						$confirmData = $gateway->handleRequest();
 
 						$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
+
+						$this->model->_Db->commit();
 					} catch (\Throwable $e) {
+						$this->model->_Db->rollback();
+
 						if (get_class($e) !== 'Model\\Payments\\PaymentException')
 							$e = new PaymentException($e->getMessage(), $e->getCode(), $e);
 
