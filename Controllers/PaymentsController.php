@@ -48,7 +48,12 @@ class PaymentsController extends Controller
 
 						$confirmData = $gateway->handleRequest();
 
-						$response = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
+						if ($confirmData['dummy'] ?? false) {
+							$response = $config['response-if-already-paid']($supposedGateway, null, []);
+						} else {
+							$confirmResponse = $this->model->_Payments->payOrder($supposedGateway, $confirmData['id'], $confirmData['price'], $confirmData['meta'] ?? []);
+							$response = $confirmData['response'] ?? $confirmResponse; // Se il metodo di pagamento vuole rispondere in un dato modo, ha la priorità
+						}
 
 						$this->model->_Db->commit();
 					} catch (\Throwable $e) {
