@@ -18,7 +18,7 @@ $config = [
 			\'template\' => \'confirm\',
 		];
 	},
-	\'response-if-already-paid\' => function (string $gateway, \\Model\\Payments\\PaymentsOrderInterface $order, array $gatewayMeta) {
+	\'response-if-already-paid\' => function (string $gateway, ?\\Model\\Payments\\PaymentsOrderInterface $order, array $gatewayMeta) {
 		return [
 			\'type\' => \'redirect\',
 			\'url\' => PATH,
