@@ -1,6 +1,7 @@
 <?php namespace Model\Payments\Controllers;
 
 use Model\Core\Controller;
+use Model\Db\Db;
 use Model\Payments\PaymentException;
 use Model\Payments\PaymentInterface;
 
@@ -41,10 +42,12 @@ class PaymentsController extends Controller
 					if (!($gateway instanceof PaymentInterface))
 						throw new \Exception('Bad payment gateway');
 
-					try {
-						$this->model->_Db->beginTransaction();
+					$db = Db::getConnection();
 
-						$this->model->_Db->updateOrInsert('main_settings', ['k' => 'payments-dummy'], ['v' => time() . '-' . uniqid()]);
+					try {
+						$db->beginTransaction();
+
+						\Model\Settings\Settings::set('payments-dummy', time() . '-' . uniqid());
 
 						$confirmData = $gateway->handleRequest();
 
@@ -55,9 +58,9 @@ class PaymentsController extends Controller
 							$response = $confirmData['response'] ?? $confirmResponse; // Se il metodo di pagamento vuole rispondere in un dato modo, ha la priorità
 						}
 
-						$this->model->_Db->commit();
+						$db->commit();
 					} catch (\Throwable $e) {
-						$this->model->_Db->rollback();
+						$db->rollback();
 
 						if (get_class($e) !== 'Model\\Payments\\PaymentException')
 							$e = new PaymentException($e->getMessage(), $e->getCode(), $e);
