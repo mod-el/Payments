@@ -12,7 +12,7 @@ interface PaymentsOrderInterface
 
 	public function isPaid(): bool;
 
-	public function markAsPaid();
+	public function markAsPaid(): void;
 
 	public function getInvoiceId(): ?string;
 }
