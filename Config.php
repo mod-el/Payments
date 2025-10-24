@@ -30,21 +30,6 @@ $config = [
 		});
 	}
 
-	/**
-	 * @return array
-	 */
-	public function getRules(): array
-	{
-		return [
-			'rules' => [
-				'payments' => 'payments',
-			],
-			'controllers' => [
-				'Payments',
-			],
-		];
-	}
-
 	public function getConfigData(): ?array
 	{
 		return [];
